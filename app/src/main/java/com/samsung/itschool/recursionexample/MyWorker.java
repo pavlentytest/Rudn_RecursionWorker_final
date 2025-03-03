@@ -6,24 +6,28 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import androidx.core.content.ContextCompat;
 import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import java.io.File;
+import java.util.ArrayList;
 
 public class MyWorker extends Worker {
 
     private final StringBuilder stringBuilder;
+    private Context context;
 
     public MyWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
         this.stringBuilder = new StringBuilder();
+        this.context = context;
     }
 
     @NonNull
     @Override
     public Result doWork() {
-        StringBuilder result = searchFiles(new File(Environment.getExternalStorageDirectory().getPath()+"/Pictures"));
+        StringBuilder result = searchFiles(new File(context.getFilesDir().getParent()));
         Data outputData = new Data.Builder().putString("RESULT",result.toString()).build();
         return Result.success(outputData);
     }
@@ -36,7 +40,7 @@ public class MyWorker extends Worker {
                     stringBuilder.append("\n").append(" -- File: ").append(file.getName());
                 }
                 else if (file.isDirectory()) {
-                    Log.w("RRRR", file.getName() + "D");
+                    Log.w("RRR", file.getName() + "D");
                     stringBuilder.append("\n").append("Dir: ").append(file.getName());
                     searchFiles(file.getAbsoluteFile());
                 }
